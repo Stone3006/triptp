@@ -5,16 +5,12 @@ plugins {
 
 android {
     namespace = "main.triptip"
-    compileSdk {
-        version = release(36) {
-            minorApiLevel = 1
-        }
-    }
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "main.triptip"
         minSdk = 24
-        targetSdk = 36
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -31,15 +27,40 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_1_8
+        targetCompatibility = JavaVersion.VERSION_1_8
     }
     buildFeatures {
         compose = true
     }
+    composeOptions {
+        kotlinCompilerExtensionVersion = "1.5.1"
+    }
+    packagingOptions {
+        resources.excludes.add("/META-INF/{AL2.0,LGPL2.1}")
+    }
 }
 
 dependencies {
+
+    // Navigation
+    implementation("androidx.navigation:navigation-compose:2.7.7")
+
+    // MapLibre
+    implementation(libs.maplibre)
+
+    // Location
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    // HTTP (for OSRM routing)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // JASON
+    implementation("org.json:json:20240303")
+
+    // Lifecycle
+    implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
