@@ -20,9 +20,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import main.triptip.viewmodel.RouteViewModel
-
-
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
+import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
+import main.triptip.R
 
 
 // Local Data Model
@@ -39,7 +43,7 @@ data class CommunityPost(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CommunityRoutesScreen(viewModel: RouteViewModel) {
+fun CommunityRoutesScreen(viewModel: RouteViewModel, navController: NavController) {
     val characterLimit = 500
     var newPostText by remember { mutableStateOf("") }
 
@@ -129,7 +133,7 @@ fun CommunityRoutesScreen(viewModel: RouteViewModel) {
                 }
             }
         },
-        bottomBar = { MockBottomNavBar() }
+        bottomBar = { MockBottomNavBar(navController, "routes") }
     ) { paddingValues ->
         LazyColumn(
             modifier = Modifier.fillMaxSize().padding(paddingValues).background(Color(0xFFF8F9FA)),
@@ -249,12 +253,29 @@ fun CommunityRouteCard(post: CommunityPost) {
 }
 
 @Composable
-fun MockBottomNavBar() {
+fun MockBottomNavBar(navController: NavController, currentRoute: String) {
+    val items = listOf(
+        Triple("search", "Search", R.drawable.search_button),
+        Triple("create", "Create", R.drawable.create_button),
+        Triple("routes", "Saved", R.drawable.saved_button),
+        Triple("profile", "Profile", R.drawable.profile_button)
+    )
     NavigationBar(containerColor = Color.White) {
-        NavigationBarItem(selected = true, onClick = {}, icon = { Icon(Icons.Default.Search, null) }, label = { Text("Search") })
-        NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.Refresh, null) }, label = { Text("Create") })
-        NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.List, null) }, label = { Text("Saved") })
-        NavigationBarItem(selected = false, onClick = {}, icon = { Icon(Icons.Default.Person, null) }, label = { Text("Profile") })
+        items.forEach { item ->
+            NavigationBarItem(
+                selected = item.first == currentRoute,
+                onClick = {
+                    if (item.first == "profile") return@NavigationBarItem
+                    navController.navigate(item.first) {
+                        popUpTo(navController.graph.startDestinationId) { saveState = true }
+                        launchSingleTop = true
+                        restoreState = true
+                    }
+                },
+                icon = { Image(painter = painterResource(item.third), contentDescription = item.second, modifier = Modifier.size(22.dp)) },
+                label = { Text(item.second) }
+            )
+        }
     }
 }
 
@@ -263,5 +284,5 @@ fun MockBottomNavBar() {
 fun CommunityRoutesScreenPreview() {
     val viewModel = RouteViewModel()
 
-    CommunityRoutesScreen(viewModel = viewModel)
+    CommunityRoutesScreen(viewModel = viewModel, navController = rememberNavController())
 }
