@@ -66,7 +66,6 @@ private fun SearchBottomBar(currentRoute: String, navController: NavController) 
             items.forEach { item ->
                 val isSelected = item.first == currentRoute
                 Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.clickable {
-                    if (item.first == "profile") return@clickable
                     navController.navigate(item.first) {
                         popUpTo(navController.graph.startDestinationId) { saveState = true }
                         launchSingleTop = true

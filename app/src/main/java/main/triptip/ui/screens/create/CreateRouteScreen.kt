@@ -851,7 +851,6 @@ private fun TripTipBottomBar(currentRoute: String, navController: NavController)
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier.clickable {
-                        if (item.route == "profile") return@clickable
                         navController.navigate(item.route) {
                             popUpTo(navController.graph.startDestinationId) { saveState = true }
                             launchSingleTop = true

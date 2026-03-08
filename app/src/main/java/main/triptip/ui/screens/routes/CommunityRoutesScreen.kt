@@ -265,7 +265,6 @@ fun MockBottomNavBar(navController: NavController, currentRoute: String) {
             NavigationBarItem(
                 selected = item.first == currentRoute,
                 onClick = {
-                    if (item.first == "profile") return@NavigationBarItem
                     navController.navigate(item.first) {
                         popUpTo(navController.graph.startDestinationId) { saveState = true }
                         launchSingleTop = true
