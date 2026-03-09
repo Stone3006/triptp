@@ -14,11 +14,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    var isLoading by remember { mutableStateOf(false) }
 
     Column(
         modifier = Modifier
@@ -52,14 +55,33 @@ fun LoginScreen(onNavigateToRegister: () -> Unit, onLoginSuccess: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         )
 
+        if (errorMessage != null) {
+            Text(text = errorMessage!!, color = MaterialTheme.colorScheme.error, modifier = Modifier.padding(top = 8.dp))
+        }
+
         Spacer(modifier = Modifier.height(32.dp))
 
         Button(
-            onClick = onLoginSuccess,
+            onClick = {
+                if (email.isNotBlank() && password.isNotBlank()) {
+                    isLoading = true
+                    FirebaseAuth.getInstance().signInWithEmailAndPassword(email, password)
+                        .addOnCompleteListener { task ->
+                            isLoading = false
+                            if (task.isSuccessful) {
+                                onLoginSuccess()
+                            } else {
+                                errorMessage = task.exception?.message
+                            }
+                        }
+                }
+            },
             modifier = Modifier.fillMaxWidth().height(50.dp),
+            enabled = !isLoading,
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF007BFF))
         ) {
-            Text("Login", fontWeight = FontWeight.Bold)
+            if (isLoading) CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
+            else Text("Login", fontWeight = FontWeight.Bold)
         }
 
         TextButton(onClick = onNavigateToRegister) {
